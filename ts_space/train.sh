@@ -1,1 +1,1 @@
-python train.py --img 640 --batch 24 --epochs 300 --data ts_cotton.yaml --weights '' --cfg yolov5l.yaml --project cotton --name YV5_NV2_017 --model_dir /mnt/ts-cvml-datastore/ts_model/models/cotton
+python train.py --img 640 --batch 24 --epochs 300 --data ts_cotton.yaml --weights '/mnt/ts-cvml-datastore/ts_model/models/cotton/YV5_NV2_0173/weights/best_cp.pt' --cfg yolov5l.yaml --project cotton --name YV5_NV2_019 --model_dir /mnt/ts-cvml-datastore/ts_model/models/cotton
