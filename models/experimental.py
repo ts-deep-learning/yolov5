@@ -95,10 +95,10 @@ class Custom_Model(nn.Module):
         self.pretrained = pretrained_model
     
     def forward(self, x):
-        x = torch.flip(x,[2])
-        x = self.preproc_layers
-        x = self.pretrained(x)
-        return x
+        y = torch.flip(x,[2])
+        mod = self.preproc_layers(y)
+        mod = self.pretrained(mod)
+        return mod
 
 
 def attempt_load(weights, map_location=None, inplace=True, fuse=True):
