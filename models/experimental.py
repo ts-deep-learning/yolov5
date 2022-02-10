@@ -4,6 +4,7 @@ Experimental modules
 """
 
 from turtle import forward
+from unicodedata import name
 import numpy as np
 import torch
 import torch.nn as nn
@@ -86,14 +87,16 @@ class Ensemble(nn.ModuleList):
         return y, None  # inference, train output
 
 class Custom_Model(nn.Module):
-    def __init__(self, pretrained_model):
+    def __init__(self, pretrained_model, nc, names):
         super(Custom_Model, self).__init__()
+        self.nc = nc
+        self.names = names
         self.pretrained = pretrained_model
         self.preproc_layers = nn.Sequential(nn.Linear(1000,100))
     
     def forward(self, x):
-        x = self.preproc_layers
         x = self.pretrained(x)
+        x = self.preproc_layers
         return x
 
 
@@ -133,5 +136,6 @@ def attempt_load(weights, map_location=None, inplace=True, fuse=True):
 
 def custom_load(weights, device):
     existing_model = attempt_load(weights, map_location=device, inplace=True, fuse=True)
-    extended_model = Custom_Model(pretrained_model=existing_model)
+    nc_existing, names_existing = existing_model.nc, existing_model.names
+    extended_model = Custom_Model(pretrained_model=existing_model, nc=nc_existing, names=names_existing)
     return extended_model

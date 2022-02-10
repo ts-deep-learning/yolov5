@@ -287,7 +287,9 @@ def run(data=ROOT / 'data/coco128.yaml',  # 'dataset.yaml path'
     ########### END OF MODEL CHANGES ##########
 
     nc, names = model.nc, model.names  # number of classes, class names
-
+    print("nc is {} and names are {}".format(nc,names))
+    print("Model")
+    print(model)
     '''
     # Input
     gs = int(max(model.stride))  # grid size (max stride)
