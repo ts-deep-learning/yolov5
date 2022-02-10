@@ -277,10 +277,14 @@ def run(data=ROOT / 'data/coco128.yaml',  # 'dataset.yaml path'
     model = attempt_load(weights, map_location=device, inplace=True, fuse=True)  # load FP32 model
     
     ########### ADD MODEL CHANGES #############
+    print("Model's state_dict:")
+    for param_tensor in model.state_dict():
+        print(param_tensor, "\t", model.state_dict()[param_tensor].size())
     ########### END OF MODEL CHANGES ##########
 
     nc, names = model.nc, model.names  # number of classes, class names
 
+    '''
     # Input
     gs = int(max(model.stride))  # grid size (max stride)
     imgsz = [check_img_size(x, gs) for x in imgsz]  # verify img_size are gs-multiples
@@ -329,6 +333,7 @@ def run(data=ROOT / 'data/coco128.yaml',  # 'dataset.yaml path'
     print(f'\nExport complete ({time.time() - t:.2f}s)'
           f"\nResults saved to {colorstr('bold', file.parent.resolve())}"
           f'\nVisualize with https://netron.app')
+    '''
 
 
 def parse_opt():
