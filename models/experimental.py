@@ -122,6 +122,7 @@ def attempt_load(weights, map_location=None, inplace=True, fuse=True):
             m._non_persistent_buffers_set = set()  # pytorch 1.6.0 compatibility
 
     if len(model) == 1:
+        print("returned plain model")
         return model[-1]  # return model
     else:
         print(f'Ensemble created with {weights}\n')

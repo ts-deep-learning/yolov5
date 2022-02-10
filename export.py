@@ -282,7 +282,8 @@ def run(data=ROOT / 'data/coco128.yaml',  # 'dataset.yaml path'
     print("Model's state_dict:")
     for param_tensor in model.state_dict():
         print(param_tensor, "\t", model.state_dict()[param_tensor].size())
-        print("weights is :", weights)
+    
+    print("weights is :", weights)
     ########### END OF MODEL CHANGES ##########
 
     nc, names = model.nc, model.names  # number of classes, class names
