@@ -3,6 +3,7 @@
 Experimental modules
 """
 
+from turtle import forward
 import numpy as np
 import torch
 import torch.nn as nn
@@ -84,6 +85,17 @@ class Ensemble(nn.ModuleList):
         y = torch.cat(y, 1)  # nms ensemble
         return y, None  # inference, train output
 
+class Custom_Model(nn.Module):
+    def __init__(self, pretrained_model):
+        super(Custom_Model, self).__init__()
+        self.pretrained = pretrained_model
+        self.preproc_layers = nn.Sequential(nn.Linear(1000,100))
+    
+    def forward(self, x):
+        x = self.preproc_layers
+        x = self.pretrained(x)
+        return x
+
 
 def attempt_load(weights, map_location=None, inplace=True, fuse=True):
     from models.yolo import Detect, Model
@@ -117,3 +129,8 @@ def attempt_load(weights, map_location=None, inplace=True, fuse=True):
             setattr(model, k, getattr(model[-1], k))
         model.stride = model[torch.argmax(torch.tensor([m.stride.max() for m in model])).int()].stride  # max stride
         return model  # return ensemble
+
+def custom_load(weights, device):
+    existing_model = attempt_load(weights, map_location=device, inplace=True, fuse=True)
+    extended_model = Custom_Model(pretrained_model=existing_model)
+    return extended_model

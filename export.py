@@ -39,6 +39,7 @@ ROOT = Path(os.path.relpath(ROOT, Path.cwd()))  # relative
 
 from models.common import Conv
 from models.experimental import attempt_load
+from models.experimental import custom_load
 from models.yolo import Detect
 from utils.activations import SiLU
 from utils.datasets import LoadImages
@@ -274,7 +275,8 @@ def run(data=ROOT / 'data/coco128.yaml',  # 'dataset.yaml path'
     # Load PyTorch model
     device = select_device(device)
     assert not (device.type == 'cpu' and half), '--half only compatible with GPU export, i.e. use --device 0'
-    model = attempt_load(weights, map_location=device, inplace=True, fuse=True)  # load FP32 model
+    #model = attempt_load(weights, map_location=device, inplace=True, fuse=True)  # load FP32 model
+    model = custom_load(weights, device)
     
     ########### ADD MODEL CHANGES #############
     print("Model's state_dict:")
