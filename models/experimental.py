@@ -95,6 +95,7 @@ class Custom_Model(nn.Module):
         self.pretrained = pretrained_model
     
     def forward(self, x):
+        print(x)
         x = self.preproc_layers
         x = self.pretrained(x)
         return x
