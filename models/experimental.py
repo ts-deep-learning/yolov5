@@ -91,12 +91,12 @@ class Custom_Model(nn.Module):
         super(Custom_Model, self).__init__()
         self.nc = nc
         self.names = names
-        self.pretrained = pretrained_model
         self.preproc_layers = nn.Sequential(nn.Linear(1000,100))
+        self.pretrained = pretrained_model
     
     def forward(self, x):
-        x = self.pretrained(x)
         x = self.preproc_layers
+        x = self.pretrained(x)
         return x
 
 
