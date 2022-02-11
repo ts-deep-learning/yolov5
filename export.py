@@ -25,7 +25,9 @@ import os
 import subprocess
 import sys
 import time
+from torchviz import make_dot
 from pathlib import Path
+import numpy as np
 
 import torch
 import torch.nn as nn
@@ -279,11 +281,12 @@ def run(data=ROOT / 'data/coco128.yaml',  # 'dataset.yaml path'
     model = custom_load(weights, device)
     
     ########### ADD MODEL CHANGES #############
+    '''
     print("Model's state_dict:")
     for param_tensor in model.state_dict():
         print(param_tensor, "\t", model.state_dict()[param_tensor].size())
     
-    print("weights is :", weights)
+    print("weights (path to .pt file) is :", weights)
     ########### END OF MODEL CHANGES ##########
 
     nc, names = model.nc, model.names  # number of classes, class names
@@ -291,6 +294,14 @@ def run(data=ROOT / 'data/coco128.yaml',  # 'dataset.yaml path'
     print("Model")
     print(model)
     '''
+    dummy_matrix = np.arange(1228800).reshape(640,640,3)
+    dummy_inp = torch.IntTensor(dummy_matrix)
+    dummy_inp = torch.unsqueeze(dummy_inp,0)
+    print(dummy_inp.size())
+    make_dot(dummy_inp, params=dict(list(model.named_parameters()))).render("yolov5_torchviz", format="png")
+
+    '''
+
     # Input
     gs = int(max(model.stride))  # grid size (max stride)
     imgsz = [check_img_size(x, gs) for x in imgsz]  # verify img_size are gs-multiples
