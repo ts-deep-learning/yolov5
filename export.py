@@ -288,20 +288,21 @@ def run(data=ROOT / 'data/coco128.yaml',  # 'dataset.yaml path'
     
     print("weights (path to .pt file) is :", weights)
     ########### END OF MODEL CHANGES ##########
-
+    '''
     nc, names = model.nc, model.names  # number of classes, class names
     print("nc is {} and names are {}".format(nc,names))
     print("Model")
     print(model)
-    '''
-    dummy_matrix = np.arange(1228800).reshape(640,640,3)
-    dummy_inp = torch.IntTensor(dummy_matrix)
-    dummy_inp = torch.unsqueeze(dummy_inp,0)
+    dummy_matrix = np.arange(1228800).reshape(3,640,640)
+    dummy_matrix = np.expand_dims(dummy_matrix, axis=0)
+    # Convert the image to row-major order, also known as "C order":
+    dummy_matrix = np.ascontiguousarray(dummy_matrix)
+    dummy_inp = torch.Tensor(dummy_matrix)
     print(dummy_inp.size())
-    make_dot(dummy_inp, params=dict(list(model.named_parameters()))).render("yolov5_torchviz", format="png")
+    dummy_model = model(dummy_inp)
+    make_dot(dummy_model, params=dict(model.named_parameters()), show_attrs=True, show_saved=True)
 
     '''
-
     # Input
     gs = int(max(model.stride))  # grid size (max stride)
     imgsz = [check_img_size(x, gs) for x in imgsz]  # verify img_size are gs-multiples
