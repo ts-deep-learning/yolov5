@@ -86,17 +86,25 @@ class Ensemble(nn.ModuleList):
         y = torch.cat(y, 1)  # nms ensemble
         return y, None  # inference, train output
 
+class Custom_Layer(nn.Module):
+    # Custom layer for preprocessing
+    def __init__(self):
+        super().__init__()
+
+    def forward(self,input):
+        x = torch.flip(input,[2])
+        return x
+
 class Custom_Model(nn.Module):
     def __init__(self, pretrained_model, nc, names):
         super(Custom_Model, self).__init__()
         self.nc = nc
         self.names = names
-        self.preproc_layers = nn.Sequential(nn.Linear(1000,100))
+        self.preproc_layers = Custom_Layer()
         self.pretrained = pretrained_model
     
-    def forward(self, x):
-        y = torch.flip(x,[2])
-        mod = self.preproc_layers(y)
+    def forward(self, input):
+        mod = self.preproc_layers(input)
         mod = self.pretrained(mod)
         return mod
 
