@@ -25,7 +25,6 @@ import os
 import subprocess
 import sys
 import time
-from torchviz import make_dot
 from pathlib import Path
 import numpy as np
 
@@ -281,27 +280,16 @@ def run(data=ROOT / 'data/coco128.yaml',  # 'dataset.yaml path'
     model = custom_load(weights, device)
     
     ########### ADD MODEL CHANGES #############
-    '''
     print("Model's state_dict:")
     for param_tensor in model.state_dict():
         print(param_tensor, "\t", model.state_dict()[param_tensor].size())
     
     print("weights (path to .pt file) is :", weights)
     ########### END OF MODEL CHANGES ##########
-    '''
     nc, names = model.nc, model.names  # number of classes, class names
     print("nc is {} and names are {}".format(nc,names))
     print("Model")
     print(model)
-    dummy_matrix = np.arange(1228800).reshape(3,640,640)
-    dummy_matrix = np.expand_dims(dummy_matrix, axis=0)
-    # Convert the image to row-major order, also known as "C order":
-    dummy_matrix = np.ascontiguousarray(dummy_matrix)
-    dummy_inp = torch.Tensor(dummy_matrix)
-    print(dummy_inp.size())
-    dummy_model = model(dummy_inp)
-    make_dot(dummy_model, params=dict(model.named_parameters()), show_attrs=True, show_saved=True)
-
     '''
     # Input
     gs = int(max(model.stride))  # grid size (max stride)

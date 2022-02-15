@@ -21,6 +21,16 @@ def main():
     c = torch.flip(a,[2])
     print("flipped image is \n",c)
 
+def placeholder():
+    dummy_matrix = np.arange(1228800).reshape(3,640,640)
+    dummy_matrix = np.expand_dims(dummy_matrix, axis=0)
+    # Convert the image to row-major order, also known as "C order":
+    dummy_matrix = np.ascontiguousarray(dummy_matrix)
+    dummy_inp = torch.Tensor(dummy_matrix)
+    print(dummy_inp.size())
+    dummy_model = model(dummy_inp)
+    make_dot(dummy_model, params=dict(model.named_parameters()), show_attrs=True, show_saved=True)
+
 def test():
     b = np.arange(1228800).reshape(640,640,3)
     a = torch.IntTensor(b)
