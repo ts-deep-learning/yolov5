@@ -8,6 +8,7 @@ from unicodedata import name
 import numpy as np
 import torch
 import torch.nn as nn
+import torchvision.transforms as T
 
 from models.common import Conv
 from utils.downloads import attempt_download
@@ -92,7 +93,11 @@ class Custom_Layer(nn.Module):
         super().__init__()
 
     def forward(self,input):
+        # flip channels to go from bgr to rgb
         x = torch.flip(input,[2])
+        transformed_img = torch.nn.Sequential(T.Resize((640,640),antialias=True))
+        x = transformed_img(x)
+        x = torch.unsqueeze(x,0)
         return x
 
 class Custom_Model(nn.Module):
