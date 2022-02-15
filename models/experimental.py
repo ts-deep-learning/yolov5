@@ -6,6 +6,7 @@ Experimental modules
 from turtle import forward
 from unicodedata import name
 import numpy as np
+import math
 import torch
 import torch.nn as nn
 import torchvision.transforms as T
@@ -112,6 +113,16 @@ class Custom_Model(nn.Module):
         mod = self.preproc_layers(input)
         mod = self.pretrained(mod)
         return mod
+    
+    def _initialize_biases(self, cf=None):  # initialize biases into Detect(), cf is class frequency
+        # https://arxiv.org/abs/1708.02002 section 3.3
+        # cf = torch.bincount(torch.tensor(np.concatenate(dataset.labels, 0)[:, 0]).long(), minlength=nc) + 1.
+        m = self.pretrained[-1]  # Detect() module
+        for mi, s in zip(m.m, m.stride):  # from
+            b = mi.bias.view(m.na, -1)  # conv.bias(255) to (3,85)
+            b.data[:, 4] += math.log(8 / (640 / s) ** 2)  # obj (8 objects per 640 image)
+            b.data[:, 5:] += math.log(0.6 / (m.nc - 0.99)) if cf is None else torch.log(cf / cf.sum())  # cls
+            mi.bias = torch.nn.Parameter(b.view(-1), requires_grad=True)
 
 
 def attempt_load(weights, map_location=None, inplace=True, fuse=True):
