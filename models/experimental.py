@@ -99,7 +99,7 @@ class Custom_Layer(nn.Module):
         x = torch.flip(input,[2])
         transformed_img = torch.nn.Sequential(T.Resize((640,640),antialias=True))
         x = transformed_img(x)
-        x = torch.unsqueeze(x,0)
+        #x = torch.unsqueeze(x,0)
         return x
 
 class Custom_Model(nn.Module):
