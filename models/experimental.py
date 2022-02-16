@@ -97,7 +97,8 @@ class Custom_Layer(nn.Module):
     def forward(self,input):
         # flip channels to go from bgr to rgb
         x = torch.flip(input,[2])
-        transformed_img = torch.nn.Sequential(T.Resize((640,640),antialias=True))
+        interpolation = T.InterpolationMode.NEAREST
+        transformed_img = torch.nn.Sequential(T.Resize((640,640),interpolation=interpolation))
         x = transformed_img(x)
         #x = torch.unsqueeze(x,0)
         return x

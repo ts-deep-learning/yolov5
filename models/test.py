@@ -1,3 +1,4 @@
+from configparser import Interpolation
 from hashlib import sha1
 from pydoc import plain
 from turtle import shape
@@ -37,7 +38,8 @@ def placeholder():
 
 def transformer(inp_tensor):
     transformed_img = torch.flip(inp_tensor,[2])
-    transformed_img = torch.nn.Sequential(T.Resize((640,640),antialias=True))
+    interpolation = T.InterpolationMode.NEAREST
+    transformed_img = torch.nn.Sequential(T.Resize((640,640),interpolation=interpolation))
     transformed_tensor = transformed_img(inp_tensor)
     transformed_tensor = torch.unsqueeze(transformed_tensor,0)
     return transformed_tensor
@@ -82,13 +84,14 @@ class Custom_Layer(nn.Module):
 
 if __name__ == '__main__':
     #plain_tensor, exp_tensor = init_tensor()
-    ch = load_yaml()
-    print(ch)
-    '''
+    #ch = load_yaml()
+    #print(ch)
+    
     inp_img = read_image("/home/sush/depth_0.jpg")
     print(inp_img.size())
     transformed_tensor = transformer(inp_img)
     print(transformed_tensor.size())
+    '''
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     print(f'Using {device} device')
     model = NeuralNetwork().to(device)
