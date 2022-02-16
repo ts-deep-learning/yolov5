@@ -78,7 +78,7 @@ class Ensemble(nn.ModuleList):
     # Ensemble of models
     def __init__(self):
         super().__init__()
-        self.stride = 1
+        self.stride = [1,1]
 
     def forward(self, x, augment=False, profile=False, visualize=False):
         y = []
