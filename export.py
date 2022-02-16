@@ -276,17 +276,17 @@ def run(data=ROOT / 'data/coco128.yaml',  # 'dataset.yaml path'
     # Load PyTorch model
     device = select_device(device)
     assert not (device.type == 'cpu' and half), '--half only compatible with GPU export, i.e. use --device 0'
-    #model = attempt_load(weights, map_location=device, inplace=True, fuse=True)  # load FP32 model
+    model = attempt_load(weights, map_location=device, inplace=True, fuse=True)  # load FP32 model
     
     ########### ADD MODEL CHANGES #############
-    model = custom_load(weights, device)
+    #model = custom_load(weights, device)
     print("Model's state_dict:")
-    for param_tensor in model.state_dict():
-        print(param_tensor, "\t", model.state_dict()[param_tensor].size())
+    #for param_tensor in model.state_dict():
+        #print(param_tensor, "\t", model.state_dict()[param_tensor].size())
     
     print("weights (path to .pt file) is :", weights)
     nc, names = model.nc, model.names  # number of classes, class names
-    #print("nc is {} and names are {}".format(nc,names))
+    print("nc is {} and names are {}".format(nc,names))
     #print("Model")
     #print(model)
     ########### END OF MODEL CHANGES ##########

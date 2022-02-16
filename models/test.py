@@ -6,6 +6,7 @@ from turtle import shape
 import os
 import torch
 import numpy as np
+import yaml
 from numpy import size
 import torch.nn as nn
 from torch.utils.data import DataLoader
@@ -41,6 +42,16 @@ def transformer(inp_tensor):
     transformed_tensor = torch.unsqueeze(transformed_tensor,0)
     return transformed_tensor
 
+def load_yaml(cfg='yolov5m.yaml'):
+    with open(cfg, errors='ignore') as f:
+                yaml_1 = yaml.safe_load(f)  # model dict
+
+    # Define model
+    print(yaml_1)
+    yaml_1['ch'] = yaml_1.get('ch')  # input channels\
+    ch = yaml_1['ch']
+    return ch
+
 class NeuralNetwork(nn.Module):
     def __init__(self):
         super(NeuralNetwork, self).__init__()
@@ -71,11 +82,13 @@ class Custom_Layer(nn.Module):
 
 if __name__ == '__main__':
     #plain_tensor, exp_tensor = init_tensor()
+    ch = load_yaml()
+    print(ch)
+    '''
     inp_img = read_image("/home/sush/depth_0.jpg")
     print(inp_img.size())
     transformed_tensor = transformer(inp_img)
     print(transformed_tensor.size())
-    '''
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     print(f'Using {device} device')
     model = NeuralNetwork().to(device)
