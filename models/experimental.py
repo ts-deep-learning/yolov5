@@ -78,6 +78,7 @@ class Ensemble(nn.ModuleList):
     # Ensemble of models
     def __init__(self):
         super().__init__()
+        self.stride = 1
 
     def forward(self, x, augment=False, profile=False, visualize=False):
         y = []
@@ -102,12 +103,13 @@ class Custom_Layer(nn.Module):
         return x
 
 class Custom_Model(nn.Module):
-    def __init__(self, pretrained_model, nc, names):
+    def __init__(self, pretrained_model, nc, names, stride):
         super(Custom_Model, self).__init__()
         self.nc = nc
         self.names = names
         self.preproc_layers = Custom_Layer()
         self.pretrained = pretrained_model
+        self.stride = stride
     
     def forward(self, input):
         mod = self.preproc_layers(input)
@@ -141,16 +143,17 @@ def attempt_load(weights, map_location=None, inplace=True, fuse=True):
 
     if len(model) == 1:
         print("returned plain model")
-        return model[-1]  # return model
+        print("model.stride is: ", model.stride)
+        return model[-1], model.stride   # return model
     else:
         print(f'Ensemble created with {weights}\n')
         for k in ['names']:
             setattr(model, k, getattr(model[-1], k))
         model.stride = model[torch.argmax(torch.tensor([m.stride.max() for m in model])).int()].stride  # max stride
-        return model  # return ensemble
+        return model # return ensemble
 
 def custom_load(weights, device):
-    existing_model = attempt_load(weights, map_location=device, inplace=True, fuse=True)
+    existing_model, stride = attempt_load(weights, map_location=device, inplace=True, fuse=True)
     nc_existing, names_existing = existing_model.nc, existing_model.names
-    extended_model = Custom_Model(pretrained_model=existing_model, nc=nc_existing, names=names_existing)
+    extended_model = Custom_Model(pretrained_model=existing_model, nc=nc_existing, names=names_existing, stride=stride)
     return extended_model

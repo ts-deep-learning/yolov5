@@ -32,6 +32,8 @@ import torch
 import torch.nn as nn
 from torch.utils.mobile_optimizer import optimize_for_mobile
 
+RUN_EXPORT = True
+
 FILE = Path(__file__).resolve()
 ROOT = FILE.parents[0]  # YOLOv5 root directory
 if str(ROOT) not in sys.path:
@@ -276,70 +278,69 @@ def run(data=ROOT / 'data/coco128.yaml',  # 'dataset.yaml path'
     # Load PyTorch model
     device = select_device(device)
     assert not (device.type == 'cpu' and half), '--half only compatible with GPU export, i.e. use --device 0'
-    model = attempt_load(weights, map_location=device, inplace=True, fuse=True)  # load FP32 model
+    #model = attempt_load(weights, map_location=device, inplace=True, fuse=True)  # load FP32 model
     
     ########### ADD MODEL CHANGES #############
-    #model = custom_load(weights, device)
+    model = custom_load(weights, device)
     #print("Model's state_dict:")
     #for param_tensor in model.state_dict():
         #print(param_tensor, "\t", model.state_dict()[param_tensor].size())
     
     print("weights (path to .pt file) is :", weights)
     nc, names = model.nc, model.names  # number of classes, class names
-    print("nc is {} and names are {}".format(nc,names))
-    print("Model")
-    print(model)
+    #print("nc is {} and names are {}".format(nc,names))
+    #print("Model")
+    #print(model)
     ########### END OF MODEL CHANGES ##########
-    '''
-    # Input
-    gs = int(max(model.stride))  # grid size (max stride)
-    imgsz = [check_img_size(x, gs) for x in imgsz]  # verify img_size are gs-multiples
-    im = torch.zeros(batch_size, 3, *imgsz).to(device)  # image size(1,3,320,192) BCHW iDetection
+    if RUN_EXPORT:
+        # Input
+        gs = int(max(model.stride))  # grid size (max stride)
+        imgsz = [check_img_size(x, gs) for x in imgsz]  # verify img_size are gs-multiples
+        im = torch.zeros(batch_size, 3, *imgsz).to(device)  # image size(1,3,320,192) BCHW iDetection
 
-    # Update model
-    if half:
-        im, model = im.half(), model.half()  # to FP16
-    model.train() if train else model.eval()  # training mode = no Detect() layer grid construction
-    for k, m in model.named_modules():
-        if isinstance(m, Conv):  # assign export-friendly activations
-            if isinstance(m.act, nn.SiLU):
-                m.act = SiLU()
-        elif isinstance(m, Detect):
-            m.inplace = inplace
-            m.onnx_dynamic = dynamic
-            # m.forward = m.forward_export  # assign forward (optional)
+        # Update model
+        if half:
+            im, model = im.half(), model.half()  # to FP16
+        model.train() if train else model.eval()  # training mode = no Detect() layer grid construction
+        for k, m in model.named_modules():
+            if isinstance(m, Conv):  # assign export-friendly activations
+                if isinstance(m.act, nn.SiLU):
+                    m.act = SiLU()
+            elif isinstance(m, Detect):
+                m.inplace = inplace
+                m.onnx_dynamic = dynamic
+                # m.forward = m.forward_export  # assign forward (optional)
 
-    for _ in range(2):
-        y = model(im)  # dry runs
-    print(f"\n{colorstr('PyTorch:')} starting from {file} ({file_size(file):.1f} MB)")
+        for _ in range(2):
+            y = model(im)  # dry runs
+        print(f"\n{colorstr('PyTorch:')} starting from {file} ({file_size(file):.1f} MB)")
 
-    # Exports
-    if 'torchscript' in include:
-        export_torchscript(model, im, file, optimize)
-    if 'onnx' in include:
-        export_onnx(model, im, file, opset, train, dynamic, simplify)
-    if 'coreml' in include:
-        export_coreml(model, im, file)
+        # Exports
+        if 'torchscript' in include:
+            export_torchscript(model, im, file, optimize)
+        if 'onnx' in include:
+            export_onnx(model, im, file, opset, train, dynamic, simplify)
+        if 'coreml' in include:
+            export_coreml(model, im, file)
 
-    # TensorFlow Exports
-    if any(tf_exports):
-        pb, tflite, tfjs = tf_exports[1:]
-        assert not (tflite and tfjs), 'TFLite and TF.js models must be exported separately, please pass only one type.'
-        model = export_saved_model(model, im, file, dynamic, tf_nms=tfjs, agnostic_nms=tfjs,
-                                   topk_per_class=topk_per_class, topk_all=topk_all, conf_thres=conf_thres,
-                                   iou_thres=iou_thres)  # keras model
-        if pb or tfjs:  # pb prerequisite to tfjs
-            export_pb(model, im, file)
-        if tflite:
-            export_tflite(model, im, file, int8=int8, data=data, ncalib=100)
-        if tfjs:
-            export_tfjs(model, im, file)
+        # TensorFlow Exports
+        if any(tf_exports):
+            pb, tflite, tfjs = tf_exports[1:]
+            assert not (tflite and tfjs), 'TFLite and TF.js models must be exported separately, please pass only one type.'
+            model = export_saved_model(model, im, file, dynamic, tf_nms=tfjs, agnostic_nms=tfjs,
+                                    topk_per_class=topk_per_class, topk_all=topk_all, conf_thres=conf_thres,
+                                    iou_thres=iou_thres)  # keras model
+            if pb or tfjs:  # pb prerequisite to tfjs
+                export_pb(model, im, file)
+            if tflite:
+                export_tflite(model, im, file, int8=int8, data=data, ncalib=100)
+            if tfjs:
+                export_tfjs(model, im, file)
 
-    # Finish
-    print(f'\nExport complete ({time.time() - t:.2f}s)'
-          f"\nResults saved to {colorstr('bold', file.parent.resolve())}"
-          f'\nVisualize with https://netron.app')
-    '''
+        # Finish
+        print(f'\nExport complete ({time.time() - t:.2f}s)'
+            f"\nResults saved to {colorstr('bold', file.parent.resolve())}"
+            f'\nVisualize with https://netron.app')
 
 
 def parse_opt():
