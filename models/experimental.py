@@ -7,6 +7,8 @@ from turtle import forward
 from unicodedata import name
 import numpy as np
 import math
+
+from pandas import Int16Dtype, Int32Dtype
 import torch
 import torch.nn as nn
 import torchvision.transforms as T
@@ -97,8 +99,8 @@ class Custom_Layer(nn.Module):
     def forward(self,input_tensor):
         # flip channels to go from bgr to rgb, the input tensor automatically gets dimension added
         # input tensor becomes [1,3,1200,1328] and we will flip the 2nd dimension
-        h,w = input_tensor.size(1), input_tensor.size(2)
-        pad_const = int((w-h)/2)
+        h,w = Int16Dtype(input_tensor.size(1)), Int16Dtype(input_tensor.size(2))
+        pad_const = Int16Dtype((w-h)/2)
         flipped_image = torch.flip(input_tensor,[1])
         interpolation = T.InterpolationMode.NEAREST
         transformer = torch.nn.Sequential(T.Pad((0,pad_const)),T.Resize((640,640),interpolation=interpolation))
