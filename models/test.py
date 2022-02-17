@@ -40,9 +40,11 @@ def placeholder():
     #make_dot(dummy_model, params=dict(model.named_parameters()), show_attrs=True, show_saved=True)
 
 def transformer(inp_tensor):
+    h,w = inp_tensor.size(1), inp_tensor.size(2)
+    pad_const = int((w-h)/2)
     flipped_image = torch.flip(inp_tensor,[0])
     interpolation = T.InterpolationMode.NEAREST
-    transformer = torch.nn.Sequential(T.Pad((0,64)),T.Resize((640,640),interpolation=interpolation))
+    transformer = torch.nn.Sequential(T.Pad((0,pad_const)),T.Resize((640,640),interpolation=interpolation))
     transformed_tensor = transformer(flipped_image)
     #transformed_tensor = torch.unsqueeze(transformed_tensor,0)
     return transformed_tensor

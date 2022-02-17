@@ -97,9 +97,11 @@ class Custom_Layer(nn.Module):
     def forward(self,input_tensor):
         # flip channels to go from bgr to rgb, the input tensor automatically gets dimension added
         # input tensor becomes [1,3,1200,1328] and we will flip the 2nd dimension
+        h,w = input_tensor.size(1), input_tensor.size(2)
+        pad_const = int((w-h)/2)
         flipped_image = torch.flip(input_tensor,[1])
         interpolation = T.InterpolationMode.NEAREST
-        transformer = torch.nn.Sequential(T.Pad((0,64)),T.Resize((640,640),interpolation=interpolation))
+        transformer = torch.nn.Sequential(T.Pad((0,pad_const)),T.Resize((640,640),interpolation=interpolation))
         transformed_tensor = transformer(flipped_image)
         #transformed_tensor = torch.unsqueeze(transformed_tensor,0)
         return transformed_tensor
