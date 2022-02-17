@@ -272,6 +272,8 @@ def run(data=ROOT / 'data/coco128.yaml',  # 'dataset.yaml path'
     t = time.time()
     include = [x.lower() for x in include]
     tf_exports = list(x in include for x in ('saved_model', 'pb', 'tflite', 'tfjs'))  # TensorFlow exports
+    # Hard set input size according to the dahua cam image size
+    imgsz = (1200,1328)
     imgsz *= 2 if len(imgsz) == 1 else 1  # expand
     file = Path(url2file(weights) if str(weights).startswith(('http:/', 'https:/')) else weights)
 
@@ -296,7 +298,7 @@ def run(data=ROOT / 'data/coco128.yaml',  # 'dataset.yaml path'
         # Input
         #gs = int(max(model.stride))  # grid size (max stride)
         #imgsz = [check_img_size(x, gs) for x in imgsz]  # verify img_size are gs-multiples
-        im = torch.zeros(batch_size, 3, *imgsz).to(device)  # image size(1,3,320,192) BCHW iDetection
+        im = torch.zeros(batch_size, 3, *imgsz).to(device)  # image size(1,3,1200,1328) BCHW iDetection
 
         print("dictated input image size is", imgsz)
         # Update model
