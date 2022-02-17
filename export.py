@@ -252,7 +252,7 @@ def export_tfjs(keras_model, im, file, prefix=colorstr('TensorFlow.js:')):
 @torch.no_grad()
 def run(data=ROOT / 'data/coco128.yaml',  # 'dataset.yaml path'
         weights=ROOT / 'yolov5s.pt',  # weights path
-        imgsz=(640, 640),  # image (height, width)
+        imgsz=(1200,1328),  # image (height, width)
         batch_size=1,  # batch size
         device='cpu',  # cuda device, i.e. 0 or 0,1,2,3 or cpu
         include=('torchscript', 'onnx', 'coreml'),  # include formats
@@ -288,16 +288,17 @@ def run(data=ROOT / 'data/coco128.yaml',  # 'dataset.yaml path'
     
     print("weights (path to .pt file) is :", weights)
     nc, names = model.nc, model.names  # number of classes, class names
-    #print("nc is {} and names are {}".format(nc,names))
+    print("nc is {} and names are {}".format(nc,names))
     #print("Model")
     #print(model)
     ########### END OF MODEL CHANGES ##########
     if RUN_EXPORT:
         # Input
-        gs = int(max(model.stride))  # grid size (max stride)
-        imgsz = [check_img_size(x, gs) for x in imgsz]  # verify img_size are gs-multiples
+        #gs = int(max(model.stride))  # grid size (max stride)
+        #imgsz = [check_img_size(x, gs) for x in imgsz]  # verify img_size are gs-multiples
         im = torch.zeros(batch_size, 3, *imgsz).to(device)  # image size(1,3,320,192) BCHW iDetection
 
+        print("dictated input image size is", imgsz)
         # Update model
         if half:
             im, model = im.half(), model.half()  # to FP16

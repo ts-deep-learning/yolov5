@@ -94,14 +94,15 @@ class Custom_Layer(nn.Module):
     def __init__(self):
         super().__init__()
 
-    def forward(self,input):
-        # flip channels to go from bgr to rgb
-        x = torch.flip(input,[2])
+    def forward(self,input_tensor):
+        # flip channels to go from bgr to rgb, the input tensor automatically gets dimension added
+        # input tensor becomes [1,3,1200,1328] and we will flip the 2nd dimension
+        flipped_image = torch.flip(input_tensor,[1])
         interpolation = T.InterpolationMode.NEAREST
-        transformed_img = torch.nn.Sequential(T.Resize((640,640),interpolation=interpolation))
-        x = transformed_img(x)
-        #x = torch.unsqueeze(x,0)
-        return x
+        transformer = torch.nn.Sequential(T.Pad((0,64)),T.Resize((640,640),interpolation=interpolation))
+        transformed_tensor = transformer(flipped_image)
+        #transformed_tensor = torch.unsqueeze(transformed_tensor,0)
+        return transformed_tensor
 
 class Custom_Model(nn.Module):
     def __init__(self, pretrained_model, nc, names, stride):

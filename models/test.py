@@ -13,7 +13,10 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 import torchvision.transforms as T
 from torchvision.io import read_image
+from torchvision.utils import save_image
 # from torchvision import datasets, transforms
+from PIL import Image
+import matplotlib.pyplot as plt
 
 RUN_MODEL = False
 
@@ -37,11 +40,11 @@ def placeholder():
     #make_dot(dummy_model, params=dict(model.named_parameters()), show_attrs=True, show_saved=True)
 
 def transformer(inp_tensor):
-    transformed_img = torch.flip(inp_tensor,[2])
+    flipped_image = torch.flip(inp_tensor,[0])
     interpolation = T.InterpolationMode.NEAREST
-    transformed_img = torch.nn.Sequential(T.Resize((640,640),interpolation=interpolation))
-    transformed_tensor = transformed_img(inp_tensor)
-    transformed_tensor = torch.unsqueeze(transformed_tensor,0)
+    transformer = torch.nn.Sequential(T.Pad((0,64)),T.Resize((640,640),interpolation=interpolation))
+    transformed_tensor = transformer(flipped_image)
+    #transformed_tensor = torch.unsqueeze(transformed_tensor,0)
     return transformed_tensor
 
 def load_yaml(cfg='yolov5m.yaml'):
@@ -88,9 +91,16 @@ if __name__ == '__main__':
     #print(ch)
     
     inp_img = read_image("/home/sush/depth_0.jpg")
-    print(inp_img.size())
+
+    print("input image size",inp_img.size())
     transformed_tensor = transformer(inp_img)
-    print(transformed_tensor.size())
+    print("transformed image size",transformed_tensor.size())
+    #transformed_tensor = transformed_tensor.cpu().detach().numpy()
+    #im = Image.fromarray(transformed_tensor)
+    #im.save("/home/sush/TS/depth_img_transformed.png")
+    plt.imshow(transformed_tensor.permute(1, 2, 0))
+    plt.show()
+    #save_image(transformed_tensor,'/home/sush/depth_img_transformed.png')
     '''
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     print(f'Using {device} device')
