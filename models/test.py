@@ -149,6 +149,8 @@ if __name__ == '__main__':
 
     print("input image size",inp_img.size())
     transformed_tensor = transformer(inp_img)
+    #transformed_tensor = transformed_tensor.unsqueeze(0)
+    print("transformed_tensor size: ", transformed_tensor.size())
     #transformed_tensor_2 = transformed_tensor.int()
     #print("transformed image size",transformed_tensor_2.size())
     #print("transformed image is", transformed_tensor_2)

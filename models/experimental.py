@@ -117,7 +117,7 @@ class Custom_Layer(nn.Module):
         interpolation = T.InterpolationMode.NEAREST
         #transformer = torch.nn.Sequential(T.Pad((0,pad_const)),T.Resize((640,640),interpolation=interpolation))
         transformer = torch.nn.Sequential(T.Resize((640,640),interpolation=interpolation))
-        transformed_tensor = transformer(pad_mask)
+        transformed_tensor = transformer(pad_mask).unsqueeze(0)
         return transformed_tensor
 
 class Custom_Model(nn.Module):
