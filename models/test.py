@@ -82,10 +82,10 @@ def transformer(input_tensor):
     #pad_const = int((w-h)/2)
     input_tensor = input_tensor.type(torch.HalfTensor)
     print("input tensor type: ", input_tensor.dtype)
-    pad_mask = torch.zeros(3, 1328, 1328, dtype=torch.float16)
+    pad_mask = torch.HalfTensor(torch.zeros(3, 1328, 1328, dtype=torch.float16))
     #pad_mask[:,0:64,:] = 1
     #pad_mask[:,1264:1328,:] = 1
-    print("pad mask size is :", pad_mask.size)
+    print("pad mask size is :", pad_mask.size())
     
     #flipped_image = torch.flip(input_tensor,[0])
     flipped_image = input_tensor
