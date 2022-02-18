@@ -98,6 +98,7 @@ def transformer(input_tensor):
     #transformer = torch.nn.Sequential(T.Pad((0,pad_const)),T.Resize((640,640),interpolation=interpolation))
     transformer = torch.nn.Sequential(T.Resize((640,640),interpolation=interpolation))
     transformed_tensor = transformer(pad_mask)
+    print("random element in float image is: ", transformed_tensor[1,200,200] )
     transformed_tensor = transformed_tensor.type(torch.IntTensor)
     print("final image_tensor", transformed_tensor)
     return transformed_tensor

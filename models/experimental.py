@@ -109,7 +109,7 @@ class Custom_Layer(nn.Module):
         #pad_const = int((w-h)/2)
         input_tensor = input_tensor.type(torch.cuda.HalfTensor)
         print("input tensor type: ", input_tensor.dtype)
-        pad_mask = torch.cuda.HalfTensor(torch.zeros(3, 1328, 1328))
+        pad_mask = torch.cuda.HalfTensor(torch.zeros(3, 1328, 1328, dtype=torch.float16))
         
         flipped_image = torch.flip(input_tensor,[1])
         pad_mask[:,64:1264,:] = flipped_image
