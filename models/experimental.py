@@ -10,6 +10,7 @@ import numpy as np
 import math
 
 from pandas import Int16Dtype, Int32Dtype
+from zmq import device
 #from obj_det_lib.tf_obj_det_api.official.vision.image_classification.classifier_trainer import initialize
 import torch
 import torch.nn as nn
@@ -109,7 +110,7 @@ class Custom_Layer(nn.Module):
         #pad_const = int((w-h)/2)
         input_tensor = input_tensor.type(torch.cuda.HalfTensor)
         print("input tensor type: ", input_tensor.dtype)
-        pad_mask = torch.cuda.HalfTensor(torch.zeros(3, 1328, 1328, dtype=torch.float16))
+        pad_mask = torch.cuda.HalfTensor(torch.zeros(3, 1328, 1328, dtype=torch.float16), device=cuda)
         
         flipped_image = torch.flip(input_tensor,[1])
         pad_mask[:,64:1264,:] = flipped_image
