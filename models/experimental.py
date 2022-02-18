@@ -10,7 +10,7 @@ import numpy as np
 import math
 
 from pandas import Int16Dtype, Int32Dtype
-from obj_det_lib.tf_obj_det_api.official.vision.image_classification.classifier_trainer import initialize
+#from obj_det_lib.tf_obj_det_api.official.vision.image_classification.classifier_trainer import initialize
 import torch
 import torch.nn as nn
 import torchvision.transforms as T
