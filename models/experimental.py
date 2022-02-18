@@ -10,6 +10,7 @@ import numpy as np
 import math
 
 from pandas import Int16Dtype, Int32Dtype
+from obj_det_lib.tf_obj_det_api.official.vision.image_classification.classifier_trainer import initialize
 import torch
 import torch.nn as nn
 import torchvision.transforms as T
@@ -100,14 +101,23 @@ class Custom_Layer(nn.Module):
     def forward(self,input_tensor):
         # flip channels to go from bgr to rgb, the input tensor automatically gets dimension added
         # input tensor becomes [1,3,1200,1328] and we will flip the 2nd dimension
-        h,w = input_tensor.size(1), input_tensor.size(2)
-        pad_const = (w-h)/2
-        pad_c = int4(pad_const)
+        #initialize tensors
+        # flip channels to go from bgr to rgb, the input tensor automatically gets dimension added
+        # input tensor becomes [1,3,1200,1328] and we will flip the 2nd dimension
+        #initialize tensors
+        #h,w = input_tensor.size(1), input_tensor.size(2)
+        #pad_const = int((w-h)/2)
+        input_tensor = input_tensor.type(torch.HalfTensor)
+        print("input tensor type: ", input_tensor.dtype)
+        pad_mask = torch.zeros(3, 1328, 1328, dtype=torch.float16)
+        
         flipped_image = torch.flip(input_tensor,[1])
+        pad_mask[:,64:1264,:] = flipped_image
+    
         interpolation = T.InterpolationMode.NEAREST
-        transformer = torch.nn.Sequential(T.Pad((0,pad_c)),T.Resize((640,640),interpolation=interpolation))
-        transformed_tensor = transformer(flipped_image)
-        #transformed_tensor = torch.unsqueeze(transformed_tensor,0)
+        #transformer = torch.nn.Sequential(T.Pad((0,pad_const)),T.Resize((640,640),interpolation=interpolation))
+        transformer = torch.nn.Sequential(T.Resize((640,640),interpolation=interpolation))
+        transformed_tensor = transformer(pad_mask)
         return transformed_tensor
 
 class Custom_Model(nn.Module):
