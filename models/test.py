@@ -74,15 +74,15 @@ def placeholder():
     return transformed_tensor[0,:,:,:]*255
     '''
 
-def transformer(input_tensor):
+def transformer_mask_pad(input_tensor):
     # flip channels to go from bgr to rgb, the input tensor automatically gets dimension added
     # input tensor becomes [1,3,1200,1328] and we will flip the 2nd dimension
     #initialize tensors
     #h,w = input_tensor.size(1), input_tensor.size(2)
     #pad_const = int((w-h)/2)
-    input_tensor = input_tensor.type(torch.HalfTensor)
-    print("input tensor type: ", input_tensor.dtype)
-    pad_mask = torch.HalfTensor(torch.zeros(3, 1328, 1328, dtype=torch.float16))
+    input_tensor = input_tensor.type(torch.FloatTensor)
+    #print("input tensor type: ", input_tensor.dtype)
+    pad_mask = torch.as_tensor(torch.zeros(3, 1328, 1328, dtype=torch.float32))
     #pad_mask[:,0:64,:] = 1
     #pad_mask[:,1264:1328,:] = 1
     print("pad mask size is :", pad_mask.size())
@@ -100,7 +100,45 @@ def transformer(input_tensor):
     transformed_tensor = transformer(pad_mask)
     print("random element in float image is: ", transformed_tensor[1,200,200] )
     transformed_tensor = transformed_tensor.type(torch.IntTensor)
-    print("final image_tensor", transformed_tensor)
+    print("final image_tensor", transformed_tensor.size())
+    return transformed_tensor
+
+def transformer(input_tensor):
+    # flip channels to go from bgr to rgb, the input tensor automatically gets dimension added
+    # input tensor becomes [1,3,1200,1328] and we will flip the 2nd dimension
+    #initialize tensors
+    h,w = input_tensor.size(1), input_tensor.size(2)
+    pad_const = int((w-h)/2)
+
+    '''
+    weights_1 = torch.Tensor([[0, 0, 0], [0, 1, 0], [0, 0, 0]]).unsqueeze(0).unsqueeze(0)
+    print("weight size is :", weights_1.size())
+    weights_2 = torch.Tensor([[0, 0, 0], [0, 1, 0], [0, 0, 0]]).unsqueeze(0).unsqueeze(0)
+    padded_inp = torch.cat((weights_1, weights_2), 1)
+    padded_inp_2 = torch.cat((padded_inp, weights_2), 1)
+    '''
+
+    padded_inp_2 = torch.ones(3,3,1,1)
+
+    # Define conv which is used only for padding
+    conv = nn.Conv2d(in_channels=3, out_channels=3, kernel_size=1, stride=1, padding=(pad_const,0), bias=False)
+    #flipped_image = torch.flip(input_tensor,[0]).unsqueeze(0)
+    flipped_image = input_tensor.unsqueeze(0)
+    print("flipped image size is", flipped_image.size())
+    # convolution requires a normalized image
+    flipped_image_2 = flipped_image/255
+    # make sure conv runs without grad (as the weights should not be learnt)
+    with torch.no_grad():
+        conv.weight = nn.Parameter(padded_inp_2)
+        padded_img = conv(flipped_image_2)
+        print("after conv size", padded_img.size())
+    interpolation = T.InterpolationMode.NEAREST
+    #transformer = torch.nn.Sequential(T.Pad((0,pad_const)),T.Resize((640,640),interpolation=interpolation))
+    transformer = torch.nn.Sequential(T.Resize((640,640),interpolation=interpolation))
+    transformed_tensor = transformer(padded_img)
+    transformed_tensor = transformed_tensor[0,:,:,:]*255
+    transformed_tensor = transformed_tensor.type(torch.IntTensor)
+    #transformed_tensor = torch.unsqueeze(transformed_tensor,0)
     return transformed_tensor
 
 def load_yaml(cfg='yolov5m.yaml'):
