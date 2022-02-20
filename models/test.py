@@ -32,6 +32,10 @@ def init_tensor():
     print("initial bgr image  \n",a.size())
     return a, c
 
+def init_tensor_2():
+    inp_img = read_image("/home/sush/Notes/PyTorch_for_DL/images/ex_image_1.png")
+    print("example rgb size",inp_img)
+
 def placeholder():
     dummy_matrix = np.arange(1228800).reshape(3,640,640)
     dummy_matrix = np.expand_dims(dummy_matrix, axis=0)
@@ -199,12 +203,13 @@ if __name__ == '__main__':
     print("random element of output image", transformed_tensor[1,200,200])
     plt.imshow(transformed_tensor.permute(1, 2, 0))
     plt.show()
-    #save_image(transformed_tensor,'/home/sush/depth_img_transformed.png')
     '''
+    #save_image(transformed_tensor,'/home/sush/depth_img_transformed.png')
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     print(f'Using {device} device')
     model = NeuralNetwork().to(device)
     print(model)
+
     if RUN_MODEL == True:
         logits = model(inp_tensor)
         pred_probab = nn.Softmax(dim=1)(logits)
