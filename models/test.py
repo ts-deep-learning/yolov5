@@ -86,7 +86,7 @@ def transformer_mask_pad(input_tensor):
     #pad_const = int((w-h)/2)
     input_tensor = input_tensor.type(torch.FloatTensor)
     #print("input tensor type: ", input_tensor.dtype)
-    pad_mask = torch.as_tensor(torch.zeros(3, 1328, 1328, dtype=torch.float32))
+    pad_mask = torch.as_tensor(torch.zeros((3, 1328, 1328), dtype=torch.float32))
     #pad_mask[:,0:64,:] = 1
     #pad_mask[:,1264:1328,:] = 1
     print("pad mask size is :", pad_mask.size())
@@ -191,7 +191,7 @@ if __name__ == '__main__':
     inp_img = read_image("/home/sush/depth_0.jpg")
 
     print("input image size",inp_img.size())
-    transformed_tensor = transformer(inp_img)
+    transformed_tensor = transformer_mask_pad(inp_img)
     #transformed_tensor = transformed_tensor.unsqueeze(0)
     print("transformed_tensor size: ", transformed_tensor.size())
     #transformed_tensor_2 = transformed_tensor.int()
