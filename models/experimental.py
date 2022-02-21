@@ -115,7 +115,7 @@ class Custom_Layer(nn.Module):
         pad_mask = torch.zeros(3, 1328, 1328)
         pad_mask = pad_mask.type(torch.cuda.FloatTensor)
         
-        flipped_image = torch.flip(input_tensor,[1])
+        flipped_image = torch.flip(input_tensor,[0])
         pad_mask[:,64:1264,:] = flipped_image
     
         interpolation = T.InterpolationMode.NEAREST
