@@ -108,15 +108,15 @@ class Custom_Layer(nn.Module):
         #initialize tensors
         #h,w = input_tensor.size(1), input_tensor.size(2)
         #pad_const = int((w-h)/2)
-        input_tensor = input_tensor.type(torch.cuda.FloatTensor)
+        input_tensor_2 = input_tensor.type(torch.cuda.FloatTensor)
         #print("input tensor type: ", input_tensor.dtype)
 
         #pad_mask = torch.as_tensor(torch.zeros((3, 1328, 1328), dtype=torch.float32), device=0)
         pad_mask = torch.zeros(3, 1328, 1328)
-        pad_mask = pad_mask.type(torch.cuda.FloatTensor)
+        pad_mask_2 = pad_mask.type(torch.cuda.FloatTensor)
         
-        flipped_image = torch.flip(input_tensor,[0])
-        pad_mask[:,64:1264,:] = flipped_image
+        #flipped_image = torch.flip(input_tensor_2,[0])
+        pad_mask_2[:,64:1264,:] = torch.flip(input_tensor_2,[0])
     
         interpolation = T.InterpolationMode.NEAREST
         #transformer = torch.nn.Sequential(T.Pad((0,pad_const)),T.Resize((640,640),interpolation=interpolation))
