@@ -106,13 +106,13 @@ class Custom_Layer(nn.Module):
         # flip channels to go from bgr to rgb, the input tensor automatically gets dimension added
         # input tensor becomes [1,3,1200,1328] and we will flip the 2nd dimension
         #initialize tensors
-        #h,w = input_tensor.size(1), input_tensor.size(2)
-        #pad_const = int((w-h)/2)
-        pad_const = torch.cuda.IntTensor(int((input_tensor.detach().size(2)-input_tensor.detach().size(1))/2))
+        h,w = input_tensor.detach().size(1), input_tensor.detach().size(2)
+        pad_const = int((w-h)/2)
+        #pad_const = torch.cuda.IntTensor(int((input_tensor.detach().size(2)-input_tensor.detach().size(1))/2))
         input_tensor_2 = torch.cuda.FloatTensor(input_tensor.detach())
-        #print("input tensor type: ", input_tensor.dtype)
 
-        #pad_mask = torch.as_tensor(torch.zeros((3, 1328, 1328), dtype=torch.float32), device=0)
+        # old #pad_mask = torch.as_tensor(torch.zeros((3, 1328, 1328), dtype=torch.float32), device=0)
+        
         #pad_mask = torch.zeros(3, 1328, 1328, device=0)
         #pad_mask_2 = torch.cuda.FloatTensor(pad_mask.detach())
         
