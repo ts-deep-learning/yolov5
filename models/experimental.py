@@ -108,20 +108,22 @@ class Custom_Layer(nn.Module):
         #initialize tensors
         #h,w = input_tensor.size(1), input_tensor.size(2)
         #pad_const = int((w-h)/2)
+        pad_const = torch.cuda.IntTensor((input_tensor.detach().size(2)-input_tensor.detach().size(1))/2)
         input_tensor_2 = torch.cuda.FloatTensor(input_tensor.detach())
         #print("input tensor type: ", input_tensor.dtype)
 
         #pad_mask = torch.as_tensor(torch.zeros((3, 1328, 1328), dtype=torch.float32), device=0)
-        pad_mask = torch.zeros(3, 1328, 1328, device=0)
-        pad_mask_2 = torch.cuda.FloatTensor(pad_mask.detach())
+        #pad_mask = torch.zeros(3, 1328, 1328, device=0)
+        #pad_mask_2 = torch.cuda.FloatTensor(pad_mask.detach())
         
-        #flipped_image = torch.flip(input_tensor_2,[0])
-        pad_mask_2[:,64:1264,:] = torch.flip(input_tensor_2,[0])
+        flipped_image = torch.flip(input_tensor_2,[0])
+        #pad_mask_2[:,64:1264,:] = torch.flip(input_tensor_2,[0])
     
         interpolation = T.InterpolationMode.NEAREST
-        #transformer = torch.nn.Sequential(T.Pad((0,pad_const)),T.Resize((640,640),interpolation=interpolation))
-        transformer = torch.nn.Sequential(T.Resize((640,640),interpolation=interpolation))
-        transformed_tensor = transformer(pad_mask).unsqueeze(0)
+        transformer = torch.nn.Sequential(T.Pad((0,pad_const)),T.Resize((640,640),interpolation=interpolation))
+        #transformer = torch.nn.Sequential(T.Resize((640,640),interpolation=interpolation))
+        #transformed_tensor = transformer(pad_mask).unsqueeze(0)
+        transformed_tensor = transformer(flipped_image).unsqueeze(0)
         return transformed_tensor
 
 class Custom_Model(nn.Module):
