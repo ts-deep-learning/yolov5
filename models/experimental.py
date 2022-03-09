@@ -108,7 +108,7 @@ class Custom_Layer(nn.Module):
         #initialize tensors
         #h,w = input_tensor.size(1), input_tensor.size(2)
         #pad_const = int((w-h)/2)
-        pad_const = torch.cuda.IntTensor((input_tensor.detach().size(2)-input_tensor.detach().size(1))/2)
+        pad_const = torch.cuda.IntTensor(int((input_tensor.detach().size(2)-input_tensor.detach().size(1))/2))
         input_tensor_2 = torch.cuda.FloatTensor(input_tensor.detach())
         #print("input tensor type: ", input_tensor.dtype)
 
