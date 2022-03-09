@@ -106,10 +106,11 @@ class Custom_Layer(nn.Module):
         # flip channels to go from bgr to rgb, the input tensor automatically gets dimension added
         # input tensor becomes [1,3,1200,1328] and we will flip the 2nd dimension
         #initialize tensors
-        #h,w = input_tensor.detach().size(1), input_tensor.detach().size(2)
-        #pad_const = int((w-h)/2)
+        h,w = input_tensor.detach().size(1), input_tensor.detach().size(2)
+        pad_const = int((w-h)/2)
         #pad_const = torch.cuda.IntTensor(int((input_tensor.detach().size(2)-input_tensor.detach().size(1))/2))
-        input_tensor_2 = torch.cuda.FloatTensor(input_tensor.detach())
+        #input_tensor_2 = torch.cuda.FloatTensor(input_tensor.detach())
+        input_tensor_2 = torch.as_tensor(input_tensor, dytpe=torch.float32, device=0)
 
         # old #pad_mask = torch.as_tensor(torch.zeros((3, 1328, 1328), dtype=torch.float32), device=0)
         
@@ -120,8 +121,8 @@ class Custom_Layer(nn.Module):
         #pad_mask_2[:,64:1264,:] = torch.flip(input_tensor_2,[0])
     
         interpolation = T.InterpolationMode.NEAREST
-        #transformer = torch.nn.Sequential(T.Pad((0,pad_const)),T.Resize((640,640),interpolation=interpolation))
-        transformer = torch.nn.Sequential(T.Resize((640,640),interpolation=interpolation))
+        transformer = torch.nn.Sequential(T.Pad((0,pad_const)),T.Resize((640,640),interpolation=interpolation))
+        #transformer = torch.nn.Sequential(T.Resize((640,640),interpolation=interpolation))
         #transformed_tensor = transformer(pad_mask).unsqueeze(0)
         transformed_tensor = transformer(flipped_image)
         return transformed_tensor
