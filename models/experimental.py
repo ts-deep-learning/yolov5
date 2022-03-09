@@ -123,7 +123,7 @@ class Custom_Layer(nn.Module):
         #transformer = torch.nn.Sequential(T.Pad((0,pad_const)),T.Resize((640,640),interpolation=interpolation))
         transformer = torch.nn.Sequential(T.Resize((640,640),interpolation=interpolation))
         #transformed_tensor = transformer(pad_mask).unsqueeze(0)
-        transformed_tensor = transformer(flipped_image).unsqueeze(0)
+        transformed_tensor = transformer(flipped_image)
         return transformed_tensor
 
 class Custom_Model(nn.Module):
