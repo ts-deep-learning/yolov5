@@ -110,7 +110,7 @@ class Custom_Layer(nn.Module):
         pad_const = int((w-h)/2)
         #pad_const = torch.cuda.IntTensor(int((input_tensor.detach().size(2)-input_tensor.detach().size(1))/2))
         #input_tensor_2 = torch.cuda.FloatTensor(input_tensor.detach())
-        input_tensor_2 = torch.as_tensor(input_tensor, dytpe=torch.float32, device=0)
+        input_tensor_2 = torch.as_tensor(input_tensor, dtype=torch.float32, device=0)
 
         # old #pad_mask = torch.as_tensor(torch.zeros((3, 1328, 1328), dtype=torch.float32), device=0)
         
