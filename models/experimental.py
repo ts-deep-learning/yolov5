@@ -110,14 +110,14 @@ class Custom_Layer(nn.Module):
         pad_const = int((w-h)/2)
         #pad_const = torch.cuda.IntTensor(int((input_tensor.detach().size(2)-input_tensor.detach().size(1))/2))
         #input_tensor_2 = torch.cuda.FloatTensor(input_tensor.detach())
-        input_tensor_2 = torch.as_tensor(input_tensor, dtype=torch.float32, device=0)
+        #input_tensor_2 = torch.as_tensor(input_tensor, dtype=torch.float32, device=0)
 
         # old #pad_mask = torch.as_tensor(torch.zeros((3, 1328, 1328), dtype=torch.float32), device=0)
         
         #pad_mask = torch.zeros(3, 1328, 1328, device=0)
         #pad_mask_2 = torch.cuda.FloatTensor(pad_mask.detach())
         
-        flipped_image = torch.flip(input_tensor_2,[0])
+        flipped_image = torch.flip(input_tensor,[0])
         #pad_mask_2[:,64:1264,:] = torch.flip(input_tensor_2,[0])
     
         interpolation = T.InterpolationMode.NEAREST
