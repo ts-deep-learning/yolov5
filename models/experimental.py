@@ -128,12 +128,12 @@ class Custom_Layer(nn.Module):
         transformed_tensor = transformer(flipped_image)
         return transformed_tensor
         '''
-        h,w = input_tensor.size(1), input_tensor.size(2)
-        pad_const = int((w-h)/2)
+        #h,w = input_tensor.size(1), input_tensor.size(2)
+        #pad_const = int((w-h)/2)
         #Note: with padding flip 1st dimension for bgr-rgb, without padding flip 0th dimension
         flipped_image = torch.flip(input_tensor, [1])
         interpolation = T.InterpolationMode.NEAREST
-        transformer = torch.nn.Sequential(T.Pad((0,pad_const)),T.Resize((640,640),interpolation=interpolation))
+        transformer = torch.nn.Sequential(T.Pad((0,64)),T.Resize((640,640),interpolation=interpolation))
         transformed_tensor = transformer(flipped_image)
         return transformed_tensor
 
