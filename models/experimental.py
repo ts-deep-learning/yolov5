@@ -130,10 +130,10 @@ class Custom_Layer(nn.Module):
         '''
         h,w = input_tensor.size(1), input_tensor.size(2)
         pad_const = (w-h)/2
-        pad_c = int4(pad_const)
+        pad_c = int(pad_const)
         flipped_image = torch.flip(input_tensor, [1])
         interpolation = T.InterpolationMode.NEAREST
-        transformer = torch.nn.Sequential(T.Pad((0,pad_const)),T.Resize((640,640),interpolation=interpolation))
+        transformer = torch.nn.Sequential(T.Pad((0,pad_c)),T.Resize((640,640),interpolation=interpolation))
         transformed_tensor = transformer(flipped_image)
         return transformed_tensor
 
