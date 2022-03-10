@@ -148,8 +148,7 @@ class Custom_Model(nn.Module):
     
     def forward(self, input):
         # add with no grad condition for the next line?
-        with torch.no_grad():
-            mod = self.preproc_layers(input)
+        mod = self.preproc_layers(input)
         mod = self.pretrained(mod)
         return mod
 
