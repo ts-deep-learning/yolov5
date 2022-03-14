@@ -139,7 +139,8 @@ class Custom_Layer(nn.Module):
         print("flipped tensor size is", flipped_image.size())
         print("random pixel of the new tensor is: ", flipped_image[0,0,200,200])
         interpolation = T.InterpolationMode.NEAREST
-        transformer = torch.nn.Sequential(T.Pad((0,64)),T.Resize((640,640),interpolation=interpolation))
+        #transformer = torch.nn.Sequential(T.Pad((0,64)),T.Resize((640,640),interpolation=interpolation))
+        transformer = torch.nn.Sequential(T.Resize((640,640),interpolation=interpolation))
         transformed_tensor = transformer(flipped_image)
         print("final image size", transformed_tensor.size())
         print("*************************************************")
