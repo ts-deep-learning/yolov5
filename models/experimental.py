@@ -134,7 +134,7 @@ class Custom_Layer(nn.Module):
         #Note: with padding flip 1st dimension for bgr-rgb, without padding flip 0th dimension
         print("*************************************************")
         print("input_tensor size", input_tensor.size())
-        input_tensor = input_tensor[0,:,:,:]/255
+        input_tensor = input_tensor[:,:,:,:]/255
         flipped_image = torch.flip(input_tensor, [1])
         print("flipped tensor size is", flipped_image.size())
         print("random pixel of the new tensor is: ", flipped_image[0,0,200,200])
