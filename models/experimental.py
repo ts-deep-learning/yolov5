@@ -133,13 +133,13 @@ class Custom_Layer(nn.Module):
 
         #Note: with padding flip 1st dimension for bgr-rgb, without padding flip 0th dimension
         print("*************************************************")
-        print(input_tensor.size())
+        print("input_tensor size", input_tensor.size())
         print("*************************************************")
-        flipped_image = torch.flip(input_tensor.permute(0,1,3,2), [1])
+        flipped_image = torch.flip(input_tensor, [1])
         interpolation = T.InterpolationMode.NEAREST
         transformer = torch.nn.Sequential(T.Pad((0,64)),T.Resize((640,640),interpolation=interpolation))
         transformed_tensor = transformer(flipped_image)
-        print(transformed_tensor.size())
+        print("final image size", transformed_tensor.size())
         return transformed_tensor
 
 class Custom_Model(nn.Module):
@@ -152,6 +152,7 @@ class Custom_Model(nn.Module):
         self.stride = stride
     
     def forward(self, input):
+        print("input size is:   ", input.size())
         # add with no grad condition for the next line?
         mod = self.preproc_layers(input)
         mod = self.pretrained(mod)
