@@ -132,13 +132,12 @@ class Custom_Layer(nn.Module):
         #pad_const = int((w-h)/2)
 
         #Note: with padding flip 1st dimension for bgr-rgb, without padding flip 0th dimension
-        flipped_image = torch.flip(input_tensor, [1])
+        flipped_image = torch.flip(input_tensor.permute(2,0,1), [1])
         interpolation = T.InterpolationMode.NEAREST
         transformer = torch.nn.Sequential(T.Pad((0,64)),T.Resize((640,640),interpolation=interpolation))
         transformed_tensor = transformer(flipped_image)
         print(transformed_tensor.size())
-        transformed_tensor_2 = transformed_tensor.permute(0, 3, 1, 2)
-        return transformed_tensor_2
+        return transformed_tensor
 
 class Custom_Model(nn.Module):
     def __init__(self, pretrained_model, nc, names, stride):
