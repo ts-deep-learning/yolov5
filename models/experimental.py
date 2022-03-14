@@ -137,7 +137,7 @@ class Custom_Layer(nn.Module):
         transformer = torch.nn.Sequential(T.Pad((0,64)),T.Resize((640,640),interpolation=interpolation))
         transformed_tensor = transformer(flipped_image)
         print(transformed_tensor.size())
-        transformed_tensor_2 = transformed_tensor.permute(2, 0, 1)
+        transformed_tensor_2 = transformed_tensor.permute(0, 3, 1, 2)
         return transformed_tensor_2
 
 class Custom_Model(nn.Module):
