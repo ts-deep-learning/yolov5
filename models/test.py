@@ -105,6 +105,7 @@ def transformer_mask_pad(input_tensor):
     print("random element in float image is: ", transformed_tensor[1,200,200] )
     transformed_tensor = transformed_tensor.type(torch.IntTensor)
     print("final image_tensor", transformed_tensor.size())
+    transformed_tensor = transformed_tensor.permute(1, 2, 0)
     return transformed_tensor
 
 def transformer(input_tensor):
@@ -200,8 +201,8 @@ if __name__ == '__main__':
     #transformed_tensor = transformed_tensor.cpu().detach().numpy()
     #im = Image.fromarray(transformed_tensor)
     #im.save("/home/sush/TS/depth_img_transformed.png")
-    print("random element of output image", transformed_tensor[1,200,200])
-    plt.imshow(transformed_tensor.permute(1, 2, 0))
+    print("random element of output image", transformed_tensor[200,200,0])
+    plt.imshow(transformed_tensor)
     plt.show()
     '''
     #save_image(transformed_tensor,'/home/sush/depth_img_transformed.png')
