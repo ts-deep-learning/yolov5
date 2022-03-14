@@ -33,6 +33,8 @@ def init_tensor():
     c = torch.unsqueeze(a,0)
     #a = torch.arange(27).view(3,3,3)
     d = c[0,0,:,:]/255
+    d = c[0,1,:,:]/255
+    d = c[0,2,:,:]/255
     transformed_tensor = d.cpu().detach().numpy()
     print("normalized tensor is", transformed_tensor)
     return d
@@ -58,5 +60,5 @@ def norm_test():
     print("time taken for norm on small image is {}".format(round((time.time() - start_2) * 1000, 3)))
 
 if __name__ == '__main__':
-    #input_tensor = init_tensor()
-    norm_test()
+    input_tensor = init_tensor()
+    #norm_test()
