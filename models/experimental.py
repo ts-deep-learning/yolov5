@@ -134,7 +134,7 @@ class Custom_Layer(nn.Module):
         #Note: with padding flip 1st dimension for bgr-rgb, without padding flip 0th dimension
         print("*************************************************")
         print("input_tensor size", input_tensor.size())
-        normalizer = T.Compose(T.ToTensor())
+        normalizer = T.Compose([T.ToTensor()])
         input_tensor_2 = normalizer(input_tensor)
         flipped_image = torch.flip(input_tensor_2, [1])
         print("random pixel of the new tensor is: ", flipped_image[0,1,200,200])
