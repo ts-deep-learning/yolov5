@@ -252,7 +252,7 @@ def export_tfjs(keras_model, im, file, prefix=colorstr('TensorFlow.js:')):
 @torch.no_grad()
 def run(data=ROOT / 'data/coco128.yaml',  # 'dataset.yaml path'
         weights=ROOT / 'yolov5s.pt',  # weights path
-        imgsz=(1328,1328),  # image (height, width)
+        imgsz=(1200,1328),  # image (height, width)
         batch_size=1,  # batch size
         device='cpu',  # cuda device, i.e. 0 or 0,1,2,3 or cpu
         include=('torchscript', 'onnx', 'coreml'),  # include formats
@@ -273,7 +273,7 @@ def run(data=ROOT / 'data/coco128.yaml',  # 'dataset.yaml path'
     include = [x.lower() for x in include]
     tf_exports = list(x in include for x in ('saved_model', 'pb', 'tflite', 'tfjs'))  # TensorFlow exports
     # Hard set input size according to the dahua cam image size
-    imgsz = (1328,1328)
+    imgsz = (1200,1328)
     imgsz *= 2 if len(imgsz) == 1 else 1  # expand
     file = Path(url2file(weights) if str(weights).startswith(('http:/', 'https:/')) else weights)
 
@@ -291,8 +291,6 @@ def run(data=ROOT / 'data/coco128.yaml',  # 'dataset.yaml path'
     print("weights (path to .pt file) is :", weights)
     nc, names = model.nc, model.names  # number of classes, class names
     print("nc is {} and names are {}".format(nc,names))
-    #print("Model")
-    #print(model)
     ########### END OF MODEL CHANGES ##########
     if RUN_EXPORT:
         # Input
