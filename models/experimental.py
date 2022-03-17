@@ -88,40 +88,6 @@ class Ensemble(nn.ModuleList):
         y = torch.cat(y, 1)  # nms ensemble
         return y, None  # inference, train output
 
-class Custom_Layer(nn.Module):
-    # Custom layer for preprocessing
-    def __init__(self):
-        super().__init__()
-
-    def forward(self,input_tensor):
-        '''
-        **Resizing and Padding**
-        interpolation = T.InterpolationMode.NEAREST
-        transformer = torch.nn.Sequential(T.Pad((0,64)),T.Resize((640,640),interpolation=interpolation), antialias=False)
-        transformed_tensor = transformer(input_tensor)
-        Note: If using resize inside model, make sure the imgsz variable in export.py is changed accordingly to input image size
-        '''
-        transformed_tensor = input_tensor/255
-        transformed_tensor = torch.flip(transformed_tensor, [1])
-        return transformed_tensor
-
-# class which creates model with inbuilt preprocessing (defined in Custom_Layer)
-class Custom_Model(nn.Module):
-    def __init__(self, pretrained_model, nc, names, stride):
-        super(Custom_Model, self).__init__()
-        self.nc = nc
-        self.names = names
-        self.preproc_layers = Custom_Layer()
-        self.pretrained = pretrained_model
-        self.stride = stride
-    
-    def forward(self, input):
-        print("input size is:   ", input.size())
-        # add with no grad condition for the next line?
-        mod = self.preproc_layers(input)
-        mod = self.pretrained(mod)
-        return mod
-
 def attempt_load(weights, map_location=None, inplace=True, fuse=True):
     from models.yolo import Detect, Model
 
@@ -146,9 +112,7 @@ def attempt_load(weights, map_location=None, inplace=True, fuse=True):
             m._non_persistent_buffers_set = set()  # pytorch 1.6.0 compatibility
 
     if len(model) == 1:
-        print("returned plain model")
-        print("model.stride is: ", model.stride)
-        return model[-1], model.stride   # return model
+        return model[-1]   # return model
     else:
         print(f'Ensemble created with {weights}\n')
         for k in ['names']:
@@ -157,7 +121,46 @@ def attempt_load(weights, map_location=None, inplace=True, fuse=True):
         return model  # return ensemble
 
 def custom_load(weights, device):
-    existing_model, stride = attempt_load(weights, map_location=device, inplace=True, fuse=True)
-    nc_existing, names_existing = existing_model.nc, existing_model.names
-    extended_model = Custom_Model(pretrained_model=existing_model, nc=nc_existing, names=names_existing, stride=stride)
+    existing_model = attempt_load(weights, map_location=device, inplace=True, fuse=True)
+    extended_model = CustomModel(pretrained_model=existing_model)
     return extended_model
+
+class CustomLayer(nn.Module):
+    """
+    Defines preprocessing Layers to be added to model
+    """
+    def __init__(self):
+        super().__init__()
+
+    def forward(self,input_tensor):
+        '''
+        **Resizing and Padding**
+        interpolation = T.InterpolationMode.NEAREST
+        transformer = torch.nn.Sequential(T.Pad((0,64)),T.Resize((640,640),interpolation=interpolation), antialias=False)
+        transformed_tensor = transformer(input_tensor)
+        Note: If using resize inside model, make sure the imgsz variable in export.py is changed accordingly to input image size
+        '''
+        transformed_tensor = input_tensor/255
+        transformed_tensor = torch.flip(transformed_tensor, [1])
+        return transformed_tensor
+
+# class which creates model with inbuilt preprocessing (defined in Custom_Layer)
+class CustomModel(nn.Module):
+    """
+    Creates model with inbuilt preprocessing (defined in CustomLayer)
+
+    CustomModel  
+    """
+    def __init__(self, pretrained_model):
+        super(CustomModel, self).__init__()
+        self.nc = pretrained_model.nc
+        self.names = pretrained_model.names
+        self.preproc_layers = CustomLayer()
+        self.pretrained = pretrained_model
+        self.stride = pretrained_model.stride
+    
+    def forward(self, input):
+        print("input size to model is:   ", input.size())
+        mod = self.preproc_layers(input)
+        mod = self.pretrained(mod)
+        return mod
