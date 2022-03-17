@@ -401,7 +401,7 @@ def run(data=ROOT / 'data/coco128.yaml',  # 'dataset.yaml path'
         topk_all=100,  # TF.js NMS: topk for all classes to keep
         iou_thres=0.45,  # TF.js NMS: IoU threshold
         conf_thres=0.25,  # TF.js NMS: confidence threshold
-        preproc_addition=True # adds normalizing and BGR->RGB conversion in model
+        preproc=True # adds normalizing and BGR->RGB conversion in model
         ):
     t = time.time()
     include = [x.lower() for x in include]
