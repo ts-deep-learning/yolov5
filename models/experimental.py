@@ -99,6 +99,7 @@ class Custom_Layer(nn.Module):
         interpolation = T.InterpolationMode.NEAREST
         transformer = torch.nn.Sequential(T.Pad((0,64)),T.Resize((640,640),interpolation=interpolation), antialias=False)
         transformed_tensor = transformer(input_tensor)
+        Note: If using resize inside model, make sure the imgsz variable in export.py is changed accordingly to input image size
         '''
         transformed_tensor = input_tensor/255
         transformed_tensor = torch.flip(transformed_tensor, [1])
