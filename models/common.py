@@ -22,7 +22,6 @@ from utils.general import colorstr, increment_path, make_divisible, non_max_supp
     scale_coords, xyxy2xywh
 from utils.plots import Annotator, colors
 from utils.torch_utils import time_sync
-import torchvision.transforms as T
 
 LOGGER = logging.getLogger(__name__)
 
@@ -33,19 +32,6 @@ def autopad(k, p=None):  # kernel, padding
         p = k // 2 if isinstance(k, int) else [x // 2 for x in k]  # auto-pad
     return p
 
-
-class Custom_Layer(nn.Module):
-    # Custom layer for preprocessing
-    def __init__(self, dummy_arg):
-        super().__init__()
-
-    def forward(self,x):
-        # flip channels to go from bgr to rgb
-        x = torch.flip(x,[2])
-        transformed_img = torch.nn.Sequential(T.Resize((640,640),antialias=True))
-        x = transformed_img(x)
-        x = torch.unsqueeze(x,0).contiguous()
-        return x
 
 class Conv(nn.Module):
     # Standard convolution
