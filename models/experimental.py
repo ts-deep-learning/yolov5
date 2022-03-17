@@ -7,6 +7,7 @@ import math
 import numpy as np
 import torch
 import torch.nn as nn
+import torchvision.transforms as T
 
 from models.common import Conv
 from utils.downloads import attempt_download
@@ -86,6 +87,38 @@ class Ensemble(nn.ModuleList):
         y = torch.cat(y, 1)  # nms ensemble
         return y, None  # inference, train output
 
+class Custom_Layer(nn.Module):
+    # Custom layer for preprocessing
+    def __init__(self):
+        super().__init__()
+
+    def forward(self,input_tensor):
+        '''
+        **Resizing and Padding**
+        interpolation = T.InterpolationMode.NEAREST
+        transformer = torch.nn.Sequential(T.Pad((0,64)),T.Resize((640,640),interpolation=interpolation), antialias=False)
+        transformed_tensor = transformer(input_tensor)
+        '''
+        transformed_tensor = input_tensor/255
+        transformed_tensor = torch.flip(transformed_tensor, [1])
+        return transformed_tensor
+
+# class which creates model with inbuilt preprocessing (defined in Custom_Layer)
+class Custom_Model(nn.Module):
+    def __init__(self, pretrained_model, nc, names, stride):
+        super(Custom_Model, self).__init__()
+        self.nc = nc
+        self.names = names
+        self.preproc_layers = Custom_Layer()
+        self.pretrained = pretrained_model
+        self.stride = stride
+    
+    def forward(self, input):
+        print("input size is:   ", input.size())
+        # add with no grad condition for the next line?
+        mod = self.preproc_layers(input)
+        mod = self.pretrained(mod)
+        return mod
 
 def attempt_load(weights, map_location=None, inplace=True, fuse=True):
     from models.yolo import Detect, Model
@@ -118,3 +151,9 @@ def attempt_load(weights, map_location=None, inplace=True, fuse=True):
             setattr(model, k, getattr(model[-1], k))
         model.stride = model[torch.argmax(torch.tensor([m.stride.max() for m in model])).int()].stride  # max stride
         return model  # return ensemble
+
+def custom_load(weights, device):
+    existing_model, stride = attempt_load(weights, map_location=device, inplace=True, fuse=True)
+    nc_existing, names_existing = existing_model.nc, existing_model.names
+    extended_model = Custom_Model(pretrained_model=existing_model, nc=nc_existing, names=names_existing, stride=stride)
+    return extended_model
