@@ -64,6 +64,7 @@ ROOT = Path(os.path.relpath(ROOT, Path.cwd()))  # relative
 
 from models.common import Conv
 from models.experimental import attempt_load
+from models.experimental import custom_load
 from models.yolo import Detect
 from utils.activations import SiLU
 from utils.datasets import LoadImages
@@ -377,11 +378,10 @@ def export_tfjs(keras_model, im, file, prefix=colorstr('TensorFlow.js:')):
     except Exception as e:
         LOGGER.info(f'\n{prefix} export failure: {e}')
 
-
 @torch.no_grad()
 def run(data=ROOT / 'data/coco128.yaml',  # 'dataset.yaml path'
         weights=ROOT / 'yolov5s.pt',  # weights path
-        imgsz=(640, 640),  # image (height, width)
+        imgsz=(1200, 1328),  # image (height, width)
         batch_size=1,  # batch size
         device='cpu',  # cuda device, i.e. 0 or 0,1,2,3 or cpu
         include=('torchscript', 'onnx'),  # include formats
@@ -400,7 +400,8 @@ def run(data=ROOT / 'data/coco128.yaml',  # 'dataset.yaml path'
         topk_per_class=100,  # TF.js NMS: topk per class to keep
         topk_all=100,  # TF.js NMS: topk for all classes to keep
         iou_thres=0.45,  # TF.js NMS: IoU threshold
-        conf_thres=0.25  # TF.js NMS: confidence threshold
+        conf_thres=0.25,  # TF.js NMS: confidence threshold
+        preproc_addition=True # adds normalizing and BGR->RGB conversion in model
         ):
     t = time.time()
     include = [x.lower() for x in include]
@@ -410,18 +411,28 @@ def run(data=ROOT / 'data/coco128.yaml',  # 'dataset.yaml path'
     # Load PyTorch model
     device = select_device(device)
     assert not (device.type == 'cpu' and half), '--half only compatible with GPU export, i.e. use --device 0'
-    model = attempt_load(weights, map_location=device, inplace=True, fuse=True)  # load FP32 model
+    if preproc_addition:
+        model = custom_load(weights, device) # load FP32 model with added preproc layers
+    else:
+        model = attempt_load(weights, map_location=device, inplace=True, fuse=True)  # load FP32 model without preproc layers
     nc, names = model.nc, model.names  # number of classes, class names
 
     # Checks
+    # Hard set input size according to the dahua cam image size
+    imgsz = (1200,1328)
     imgsz *= 2 if len(imgsz) == 1 else 1  # expand
+    print("DICTATED IMAGE INPUT SIZE", imgsz)
     opset = 12 if ('openvino' in include) else opset  # OpenVINO requires opset <= 12
     assert nc == len(names), f'Model class count {nc} != len(names) {len(names)}'
 
     # Input
-    gs = int(max(model.stride))  # grid size (max stride)
-    imgsz = [check_img_size(x, gs) for x in imgsz]  # verify img_size are gs-multiples
-    im = torch.zeros(batch_size, 3, *imgsz).to(device)  # image size(1,3,320,192) BCHW iDetection
+    #gs = int(max(model.stride))  # grid size (max stride)
+    #imgsz = [check_img_size(x, gs) for x in imgsz]  # verify img_size are gs-multiples
+    im = torch.zeros(batch_size, 3, *imgsz).to(device)  # image size(1,3,1200,1328) BCHW iDetection
+
+    print("weights (path to .pt file) is :", weights)
+    nc, names = model.nc, model.names  # number of classes, class names
+    print("nc is {} and names are {}".format(nc,names))
 
     # Update model
     if half:
@@ -512,6 +523,7 @@ def parse_opt():
     parser.add_argument('--include', nargs='+',
                         default=['torchscript', 'onnx'],
                         help='torchscript, onnx, openvino, engine, coreml, saved_model, pb, tflite, edgetpu, tfjs')
+    parser.add_argument('--preproc', action='store_true', help='Torch: adds preproc to torch model')
     opt = parser.parse_args()
     print_args(FILE.stem, opt)
     return opt
