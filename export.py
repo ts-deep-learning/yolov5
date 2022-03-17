@@ -411,7 +411,7 @@ def run(data=ROOT / 'data/coco128.yaml',  # 'dataset.yaml path'
     # Load PyTorch model
     device = select_device(device)
     assert not (device.type == 'cpu' and half), '--half only compatible with GPU export, i.e. use --device 0'
-    if preproc_addition:
+    if preproc:
         model = custom_load(weights, device) # load FP32 model with added preproc layers
     else:
         model = attempt_load(weights, map_location=device, inplace=True, fuse=True)  # load FP32 model without preproc layers
