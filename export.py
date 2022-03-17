@@ -381,7 +381,7 @@ def export_tfjs(keras_model, im, file, prefix=colorstr('TensorFlow.js:')):
 @torch.no_grad()
 def run(data=ROOT / 'data/coco128.yaml',  # 'dataset.yaml path'
         weights=ROOT / 'yolov5s.pt',  # weights path
-        imgsz=(1200, 1328),  # image (height, width)
+        imgsz=(640, 640),  # image (height, width)
         batch_size=1,  # batch size
         device='cpu',  # cuda device, i.e. 0 or 0,1,2,3 or cpu
         include=('torchscript', 'onnx'),  # include formats
@@ -419,7 +419,7 @@ def run(data=ROOT / 'data/coco128.yaml',  # 'dataset.yaml path'
 
     # Checks
     # Hard set input size according to the dahua cam image size
-    imgsz = (1200,1328)
+    imgsz = (640, 640)
     imgsz *= 2 if len(imgsz) == 1 else 1  # expand
     print("DICTATED IMAGE INPUT SIZE", imgsz)
     opset = 12 if ('openvino' in include) else opset  # OpenVINO requires opset <= 12
@@ -428,7 +428,7 @@ def run(data=ROOT / 'data/coco128.yaml',  # 'dataset.yaml path'
     # Input
     #gs = int(max(model.stride))  # grid size (max stride)
     #imgsz = [check_img_size(x, gs) for x in imgsz]  # verify img_size are gs-multiples
-    im = torch.zeros(batch_size, 3, *imgsz).to(device)  # image size(1,3,1200,1328) BCHW iDetection
+    im = torch.zeros(batch_size, 3, *imgsz).to(device)  # image size(1,3,640,640) BCHW iDetection
 
     print("weights (path to .pt file) is :", weights)
     nc, names = model.nc, model.names  # number of classes, class names
